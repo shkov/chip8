@@ -26,3 +26,4 @@ core
 cmake-build-debug
 build
 .tags
+*.ch8

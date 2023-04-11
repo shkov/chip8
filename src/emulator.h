@@ -2,20 +2,22 @@
 
 #include <spdlog/spdlog.h>
 
+#include <fstream>
 #include <iostream>
+#include <string>
 
 namespace Chip8 {
 
 class Emulator {
  public:
-  Emulator() = default;
+  explicit Emulator(const std::string& filename) : rom_file{filename} {};
 
-  void Start() {
-    spdlog::info("Chip8Emulator");
-    spdlog::info("hello from {}", "ivan");
-  };
+  void StartExecutionLoop(){};
+
+  void Stop(){};
 
  private:
+  std::ifstream rom_file;
 };
 
 }  // namespace Chip8
