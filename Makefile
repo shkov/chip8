@@ -21,7 +21,7 @@ build:
 run:
 	# Running chip8 ...
 	@\
-		ROM_FILE='game.ch8' \
+		ROM_FILE='programs/ibm.ch8' \
   ./build/chip8
 	# OK
 
