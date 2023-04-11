@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <exception>
 #include <fstream>
+#include <iomanip>
 #include <ios>
 #include <iostream>
 #include <string>
@@ -40,8 +41,8 @@ class Emulator {
   };
 
   void StartExecutionLoop() {
-    for (uint8_t byte : program_text_) {
-      std::cout << byte;
+    for (const auto byte : program_text_) {
+      std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(byte);
     }
     std::cout << std::endl;
   }
