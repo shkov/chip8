@@ -5,8 +5,11 @@
 namespace chip8 {
 
 struct Instruction {
-  uint8_t high_byte;
-  uint8_t low_byte;
+  uint16_t raw;
+  uint8_t first_nibble;
+  uint8_t second_nibble;
+  uint8_t third_nibble;
+  uint8_t fourth_nibble;
 };
 
 }  // namespace chip8

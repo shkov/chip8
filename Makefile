@@ -14,7 +14,7 @@ help:
 build:
 	# Building chip8 ...
 	@mkdir -p build
-	@cmake -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -S . -B build
+	@cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -S . -B build
 	@make -C build
 
 .PHONY: run
