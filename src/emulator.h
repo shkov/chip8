@@ -2,6 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include <array>
 #include <cstdint>
 #include <exception>
 #include <fstream>
@@ -43,7 +44,12 @@ class Emulator {
   };
 
   void StartExecutionLoop() {
+    int counter{0};
     while (running_) {
+      counter++;
+      if (counter > 100) {
+        break;
+      }
       auto raw{Fetch()};
       if (!raw.has_value()) {
         return;
@@ -120,16 +126,21 @@ class Emulator {
     spdlog::info("jump to: {}", program_counter_);
   };
 
-  static void SetRegisterVX(const Instruction& instr) {
-    spdlog::info("set register VX: {:#x}", instr.first_nibble);
+  void SetRegisterVX(const Instruction& instr) {
+    size_t register_idx{instr.second_nibble};
+    variable_registers_[register_idx] = instr.raw & 0x00FF;
+    spdlog::info("set register VX to {:#x}", variable_registers_[register_idx]);
   };
 
-  static void AddToRegisterVX(const Instruction& instr) {
-    spdlog::info("add value to register VX: {:#x}", instr.first_nibble);
+  void AddToRegisterVX(const Instruction& instr) {
+    size_t register_idx{instr.second_nibble};
+    variable_registers_[register_idx] += instr.raw & 0x00FF;
+    spdlog::info("add value to register VX: {:#x}", variable_registers_[register_idx]);
   };
 
-  static void SetIndexRegister(const Instruction& instr) {
-    spdlog::info("set index register I: {:#x}", instr.first_nibble);
+  void SetIndexRegister(const Instruction& instr) {
+    index_register_ = instr.raw & 0x0FFF;
+    spdlog::info("set index register I to {:#x}", index_register_);
   };
 
   static void Display(const Instruction& instr) { spdlog::info("display/draw: {:#x}", instr.first_nibble); };
@@ -137,6 +148,7 @@ class Emulator {
   std::atomic<bool> running_{true};
   std::vector<uint8_t> program_text_;
   int program_counter_{0};
+  std::array<uint8_t, 16> variable_registers_{};
   uint16_t index_register_{0};
 };
 

@@ -22,7 +22,7 @@ run:
 	# Running chip8 ...
 	@\
 		ROM_FILE='programs/ibm.ch8' \
-  ./build/chip8
+  ./build/chip8 programs/ibm.ch8
 	# OK
 
 .PHONY: pull-submodules

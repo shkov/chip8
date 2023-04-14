@@ -9,13 +9,14 @@
 std::function<void(int)> shutdown_handler;
 void signal_handler(int signal) { shutdown_handler(signal); }
 
-int main() {
-  const char* rom_file = std::getenv("ROM_FILE");
-  if (rom_file == nullptr) {
-    spdlog::error("must provide ROM_FILE via env");
+int main(int argc, char* argv[]) {
+  std::vector<std::string> args(argv, argv + argc);
+  if (args.size() < 2) {
+    spdlog::error("must provide rom file");
     return 1;
   }
 
+  std::string rom_file{args[1]};
   chip8::Emulator emulator{rom_file};
 
   shutdown_handler = [&emulator](int signum) {
@@ -29,3 +30,4 @@ int main() {
 
   spdlog::info("bye!");
 }
+
