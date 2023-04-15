@@ -16,8 +16,8 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  std::string rom_file{args[1]};
-  chip8::Emulator emulator{rom_file};
+  std::string rom_file{ args[1] };
+  chip8::Emulator emulator{ rom_file };
 
   shutdown_handler = [&emulator](int signum) {
     spdlog::info("Interrupt signal ({}) received. Bye", signum);

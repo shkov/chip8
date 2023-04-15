@@ -3,6 +3,7 @@
 #include <spdlog/spdlog.h>
 
 #include <array>
+#include <atomic>
 #include <cstdint>
 #include <exception>
 #include <fstream>
@@ -11,6 +12,7 @@
 #include <iostream>
 #include <optional>
 #include <string>
+#include <vector>
 
 #include "instruction.h"
 
@@ -22,15 +24,15 @@ class Emulator {
   static inline const uint16_t kChip8ProgramStartAddress = 0x200;
 
   explicit Emulator(const std::string& filename) {
-    std::ifstream rom_file{filename, std::ios::in | std::ios::binary | std::ios::ate};
+    std::ifstream rom_file{ filename, std::ios::in | std::ios::binary | std::ios::ate };
     if (!rom_file) {
-      throw std::invalid_argument{"failed to open rom file"};
+      throw std::invalid_argument{ "failed to open rom file" };
     }
     rom_file.unsetf(std::ios::skipws);
 
-    int64_t file_size{rom_file.tellg()};
+    int64_t file_size{ rom_file.tellg() };
     if (file_size > kChip8MemorySize) {
-      throw std::invalid_argument{"rom file is too large to fit into chip8 memory"};
+      throw std::invalid_argument{ "rom file is too large to fit into chip8 memory" };
     }
 
     rom_file.seekg(0, std::ios::beg);
@@ -39,23 +41,23 @@ class Emulator {
 
     rom_file.read(reinterpret_cast<char*>(program_text_.data()), file_size);
     if (!rom_file.good()) {
-      throw std::runtime_error{"Error reading file"};
+      throw std::runtime_error{ "Error reading file" };
     }
   };
 
   void StartExecutionLoop() {
-    int counter{0};
+    int counter{ 0 };
     while (running_) {
       counter++;
       if (counter > 100) {
         break;
       }
-      auto raw{Fetch()};
+      auto raw{ Fetch() };
       if (!raw.has_value()) {
         return;
       }
 
-      Instruction instr{Decode(*raw)};
+      Instruction instr{ Decode(*raw) };
 
       Execute(instr);
     }
@@ -69,9 +71,9 @@ class Emulator {
     if (program_text_.size() < program_counter_) {
       return std::nullopt;
     }
-    uint8_t first{program_text_[program_counter_++]};
-    uint8_t sec{program_text_[program_counter_++]};
-    return std::array{first, sec};
+    uint8_t first{ program_text_[program_counter_++] };
+    uint8_t sec{ program_text_[program_counter_++] };
+    return std::array{ first, sec };
   };
 
   static Instruction Decode(std::array<uint8_t, 2> instr) {
@@ -79,11 +81,11 @@ class Emulator {
     uint8_t low_byte = instr[1];
 
     return Instruction{
-        .raw = static_cast<uint16_t>(static_cast<uint16_t>(high_byte << 8) | low_byte),
-        .first_nibble = static_cast<uint8_t>(high_byte >> 4),
-        .second_nibble = static_cast<uint8_t>(high_byte & 0x0F),
-        .third_nibble = static_cast<uint8_t>(low_byte >> 4),
-        .fourth_nibble = static_cast<uint8_t>(low_byte & 0x0F),
+      .raw = static_cast<uint16_t>(static_cast<uint16_t>(high_byte << 8) | low_byte),
+      .first_nibble = static_cast<uint8_t>(high_byte >> 4),
+      .second_nibble = static_cast<uint8_t>(high_byte & 0x0F),
+      .third_nibble = static_cast<uint8_t>(low_byte >> 4),
+      .fourth_nibble = static_cast<uint8_t>(low_byte & 0x0F),
     };
   };
 
@@ -116,6 +118,8 @@ class Emulator {
       case 0xD:
         Display(instr);
         break;
+      default:
+        throw std::invalid_argument{ "not known instruction" };
     }
   }
 
@@ -127,13 +131,13 @@ class Emulator {
   };
 
   void SetRegisterVX(const Instruction& instr) {
-    size_t register_idx{instr.second_nibble};
+    size_t register_idx{ instr.second_nibble };
     variable_registers_[register_idx] = instr.raw & 0x00FF;
     spdlog::info("set register VX to {:#x}", variable_registers_[register_idx]);
   };
 
   void AddToRegisterVX(const Instruction& instr) {
-    size_t register_idx{instr.second_nibble};
+    size_t register_idx{ instr.second_nibble };
     variable_registers_[register_idx] += instr.raw & 0x00FF;
     spdlog::info("add value to register VX: {:#x}", variable_registers_[register_idx]);
   };
@@ -145,11 +149,11 @@ class Emulator {
 
   static void Display(const Instruction& instr) { spdlog::info("display/draw: {:#x}", instr.first_nibble); };
 
-  std::atomic<bool> running_{true};
+  std::atomic<bool> running_{ true };
   std::vector<uint8_t> program_text_;
-  int program_counter_{0};
+  int program_counter_{ 0 };
   std::array<uint8_t, 16> variable_registers_{};
-  uint16_t index_register_{0};
+  uint16_t index_register_{ 0 };
 };
 
 }  // namespace chip8
