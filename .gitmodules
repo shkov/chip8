@@ -7,6 +7,3 @@
 [submodule "contrib/benchmark"]
 	path = contrib/benchmark
 	url = https://github.com/google/benchmark
-[submodule "contrib/sdl"]
-	path = contrib/sdl
-	url = https://github.com/libsdl-org/SDL
