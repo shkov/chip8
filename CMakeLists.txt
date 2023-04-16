@@ -9,5 +9,6 @@ add_subdirectory(contrib/spdlog)
 add_subdirectory(contrib/googletest)
 add_subdirectory(contrib/benchmark)
 add_subdirectory(contrib/sdl EXCLUDE_FROM_ALL)
+add_subdirectory(src)
 
-target_link_libraries(${PROJECT_NAME} spdlog SDL3::SDL3)
+target_link_libraries(${PROJECT_NAME} src spdlog SDL3::SDL3)
