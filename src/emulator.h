@@ -42,10 +42,8 @@ class Emulator
         uint8_t fourth_nibble;
     };
 
-    void InitMemory();
     void LoadProgramText(const std::string &filename);
     void LoadFontSet();
-    void PrintScreen();
 
     std::optional<std::array<uint8_t, 2>> Fetch();
     static Instruction Decode(std::array<uint8_t, 2> instr);
@@ -53,35 +51,38 @@ class Emulator
 
     void ClearScreen();
     void Jump(const Instruction &instr);
-    void SetRegisterVX(const Instruction &instr);
-    void AddToRegisterVX(const Instruction &instr);
+    void SetRegisterVx(const Instruction &instr);
+    void AddToRegisterVx(const Instruction &instr);
     void SetIndexRegister(const Instruction &instr);
     void Display(const Instruction &instr);
     void CallSubroutine(const Instruction &instr);
     void ReturnFromSubroutine();
-    void SkipInstructionIfVXEqual(const Instruction &instr);
-    void SkipInstructionIfVXNotEqual(const Instruction &instr);
-    void SkipInstructionIfVXEqualVY(const Instruction &instr);
-    void SkipInstructionIfVXNotEqualVY(const Instruction &instr);
-    void SetVY2VX(const Instruction &instr);
-    void VXBinaryOrVY(const Instruction &instr);
-    void VXBinaryAndVY(const Instruction &instr);
-    void VXBinaryXorVY(const Instruction &instr);
-    void AddVY2VX(const Instruction &instr);
-    void VXSubtractVY(const Instruction &instr);
-    void VYSubtractVX(const Instruction &instr);
-    void ShiftVXRight(const Instruction &instr);
-    void ShiftVXLeft(const Instruction &instr);
+    void SkipInstructionIfVxEqual(const Instruction &instr);
+    void SkipInstructionIfVxNotEqual(const Instruction &instr);
+    void SkipInstructionIfVxEqualVy(const Instruction &instr);
+    void SkipInstructionIfVxNotEqualVy(const Instruction &instr);
+    void SetVy2Vx(const Instruction &instr);
+    void VxBinaryOrVy(const Instruction &instr);
+    void VxBinaryAndVy(const Instruction &instr);
+    void VxBinaryXorVy(const Instruction &instr);
+    void AddVy2Vx(const Instruction &instr);
+    void VxSubtractVy(const Instruction &instr);
+    void VySubtractVx(const Instruction &instr);
+    void ShiftVxRight(const Instruction &instr);
+    void ShiftVxLeft(const Instruction &instr);
     void JumpWithOffset(const Instruction &instr);
-    void VXBinaryAndRandom(const Instruction &instr);
+    void VxBinaryAndRandom(const Instruction &instr);
     void SkipIfPressed(const Instruction &instr);
     void SkipIfNotPressed(const Instruction &instr);
-    void AddVX2IndexRegister(const Instruction &instr);
+    void AddVx2IndexRegister(const Instruction &instr);
     void WaitForKeyPress(const Instruction &instr);
     void SetIndexRegisterForFont(const Instruction &instr);
     void HexToDecimal(const Instruction &instr);
     void StoreRegistersInMemory(const Instruction &instr);
-    void ReadRegistersFromMemory(const Instruction &instr);
+    void LoadRegistersFromMemory(const Instruction &instr);
+    void SetDelayTimer(const Instruction &instr);
+    void SetSoundTimer(const Instruction &instr);
+    void SetDelayTimer2Vx(const Instruction &instr);
 
     int program_counter_{ kChip8ProgramStartAddress };
     std::array<uint8_t, 16> variable_registers_{};
