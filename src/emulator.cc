@@ -20,7 +20,6 @@ namespace chip8
 Emulator::Emulator(const std::string &filename, Window &w) : window_{ w }
 {
     ClearScreen();
-    InitMemory();
     LoadFontSet();
     LoadProgramText(filename);
 };
@@ -39,12 +38,6 @@ void Emulator::StartExecutionLoop()
 
         Execute(instr);
     }
-};
-
-void Emulator::InitMemory()
-{
-    memory_.resize(kChip8MemorySize);
-    std::fill(memory_.begin(), memory_.end(), 0);
 };
 
 void Emulator::LoadProgramText(const std::string &filename)
@@ -205,9 +198,9 @@ void Emulator::Display(const Instruction &instr)
                 location ^= 1;
             }
         }
-    }
 
-    window_.Draw();
+        window_.Draw(screen_);
+    }
 };
 
 } // namespace chip8

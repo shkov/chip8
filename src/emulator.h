@@ -15,10 +15,10 @@ namespace chip8
 class Emulator
 {
   public:
-    static inline const uint16_t kChip8MemorySize = 4096;
-    static inline const uint16_t kChip8ProgramStartAddress = 0x200;
-    static inline const uint8_t kChip8ScreenWidth = 64;
-    static inline const uint8_t kChip8ScreenHeight = 32;
+    static inline const uint16_t kChip8MemorySize{ 4096 };
+    static inline const uint16_t kChip8ProgramStartAddress{ 0x200 };
+    static inline const uint8_t kChip8ScreenWidth{ 64 };
+    static inline const uint8_t kChip8ScreenHeight{ 32 };
 
     static inline const std::vector<uint8_t> kChip8FontSet = {
         0xF0, 0x90, 0x90, 0x90, 0xF0, 0x20, 0x60, 0x20, 0x20, 0x70, 0xF0, 0x10, 0xF0, 0x80, 0xF0, 0xF0,
@@ -62,7 +62,7 @@ class Emulator
     std::array<uint8_t, 16> variable_registers_{};
     uint16_t index_register_{ 0 };
 
-    std::vector<uint8_t> memory_;
+    std::array<uint8_t, kChip8MemorySize> memory_{};
     std::array<std::array<uint8_t, kChip8ScreenWidth>, kChip8ScreenHeight> screen_;
     Window &window_;
 };

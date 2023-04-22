@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <array>
 #include <atomic>
 #include <chrono>
 #include <iostream>
@@ -15,10 +16,14 @@ class Window : private sf::RenderWindow
   private:
     using Base = sf::RenderWindow;
 
+    static inline const size_t kPixelSize{ 20 };
+    static inline const size_t kScreenWidth{ kPixelSize * 64 + kPixelSize - 1 };
+    static inline const size_t kScreenHeight{ kPixelSize * 32 + kPixelSize - 1 };
+
   public:
-    Window() : Base{ sf::VideoMode{ { 1280, 800 } }, "Chip8" }
+    Window() : Base{ sf::VideoMode{ { kScreenWidth, kScreenHeight } }, "Chip8" }
     {
-        clear(sf::Color::White);
+        clear(sf::Color::Black);
         display();
     };
 
@@ -39,19 +44,29 @@ class Window : private sf::RenderWindow
         return true;
     }
 
-    void Draw()
+    void Draw(const std::array<std::array<uint8_t, 64>, 32> &screen)
     {
         if (closed_)
             return;
 
-        clear(sf::Color::White);
+        clear(sf::Color::Black);
 
-        sf::RectangleShape pixel{ sf::Vector2f(10, 10) };
-        pixel.setFillColor(sf::Color::Red);
+        float position_y{ 0 };
+        float position_x{ 0 };
 
-        pixel.setPosition(sf::Vector2f(100, 100));
-
-        draw(pixel);
+        for (size_t y = 0; y < 32; ++y)
+        {
+            for (size_t x = 0; x < 64; ++x)
+            {
+                sf::RectangleShape pixel{ sf::Vector2f(kPixelSize, kPixelSize) };
+                pixel.setFillColor(screen[y][x] ? sf::Color::White : sf::Color::Black);
+                pixel.setPosition(sf::Vector2f(position_x, position_y));
+                draw(pixel);
+                position_x += kPixelSize + 1;
+            }
+            position_x = 0;
+            position_y += kPixelSize + 1;
+        }
 
         display();
     };
