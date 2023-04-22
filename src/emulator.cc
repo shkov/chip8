@@ -101,13 +101,37 @@ void Emulator::Execute(const Instruction &instr)
         switch (instr.third_nibble)
         {
         case 0xE:
-            ClearScreen();
-            return;
+            switch (instr.fourth_nibble)
+            {
+            case 0x0:
+                ClearScreen();
+                return;
+
+            case 0xE:
+                ReturnFromSubroutine();
+                return;
+            }
         }
         return;
 
     case 0x1:
         Jump(instr);
+        return;
+
+    case 0x2:
+        CallSubroutine(instr);
+        return;
+
+    case 0x3:
+        SkipInstructionIfVXEqual(instr);
+        return;
+
+    case 0x4:
+        SkipInstructionIfVXNotEqual(instr);
+        return;
+
+    case 0x5:
+        SkipInstructionIfVXEqualVY(instr);
         return;
 
     case 0x6:
@@ -116,6 +140,10 @@ void Emulator::Execute(const Instruction &instr)
 
     case 0x7:
         AddToRegisterVX(instr);
+        return;
+
+    case 0x9:
+        SkipInstructionIfVXNotEqualVY(instr);
         return;
 
     case 0xA:
@@ -140,7 +168,9 @@ void Emulator::ClearScreen()
             screen_[y][x] = 0;
         }
     }
+    window_.Draw(screen_);
 };
+
 void Emulator::Jump(const Instruction &instr)
 {
     program_counter_ = instr.raw & 0x0FFF;
@@ -202,6 +232,140 @@ void Emulator::Display(const Instruction &instr)
         window_.Draw(screen_);
     }
 };
+
+void Emulator::CallSubroutine(const Instruction &instr)
+{
+    ++stack_pointer_;
+    stack_[stack_pointer_] = program_counter_;
+    Jump(instr);
+}
+
+void Emulator::ReturnFromSubroutine()
+{
+    uint16_t addr{ stack_[stack_pointer_--] };
+    program_counter_ = addr;
+}
+
+void Emulator::SkipInstructionIfVXEqual(const Instruction &instr)
+{
+    size_t register_idx{ instr.second_nibble };
+    if (variable_registers_[register_idx] == (instr.raw & 0x00FF))
+        program_counter_ += 2;
+}
+
+void Emulator::SkipInstructionIfVXNotEqual(const Instruction &instr)
+{
+    size_t register_idx{ instr.second_nibble };
+    if (variable_registers_[register_idx] != (instr.raw & 0x00FF))
+        program_counter_ += 2;
+}
+
+void Emulator::SkipInstructionIfVXEqualVY(const Instruction &instr)
+{
+    size_t register_vx{ instr.second_nibble };
+    size_t register_vy{ instr.third_nibble };
+    if (variable_registers_[register_vx] == variable_registers_[register_vy])
+        program_counter_ += 2;
+}
+
+void Emulator::SkipInstructionIfVXNotEqualVY(const Instruction &instr)
+{
+    size_t register_vx{ instr.second_nibble };
+    size_t register_vy{ instr.third_nibble };
+    if (variable_registers_[register_vx] != variable_registers_[register_vy])
+        program_counter_ += 2;
+}
+
+void Emulator::VXBinaryOrVY(const Instruction &instr)
+{
+
+    size_t register_vx{ instr.second_nibble };
+    size_t register_vy{ instr.third_nibble };
+    variable_registers_[register_vx] = variable_registers_[register_vx] | variable_registers_[register_vy];
+}
+
+void Emulator::VXBinaryAndVY(const Instruction &instr)
+{
+    size_t register_vx{ instr.second_nibble };
+    size_t register_vy{ instr.third_nibble };
+    variable_registers_[register_vx] = variable_registers_[register_vx] & variable_registers_[register_vy];
+}
+
+void Emulator::VXBinaryXorVY(const Instruction &instr)
+{
+    size_t register_vx{ instr.second_nibble };
+    size_t register_vy{ instr.third_nibble };
+    variable_registers_[register_vx] = variable_registers_[register_vx] ^ variable_registers_[register_vy];
+}
+
+void Emulator::AddVY2VX(const Instruction &instr)
+{
+    size_t register_vx{ instr.second_nibble };
+    size_t register_vy{ instr.third_nibble };
+    int result{ variable_registers_[register_vx] + variable_registers_[register_vy] };
+    if (result > 255)
+        variable_registers_[0xF] = 1;
+    else
+        variable_registers_[0xF] = 0;
+
+    variable_registers_[register_vx] = result;
+}
+
+void Emulator::VXSubtractVY(const Instruction &instr)
+{
+}
+
+void Emulator::VYSubtractVX(const Instruction &instr)
+{
+}
+
+void Emulator::ShiftVXRight(const Instruction &instr)
+{
+}
+
+void Emulator::ShiftVXLeft(const Instruction &instr)
+{
+}
+
+void Emulator::JumpWithOffset(const Instruction &instr)
+{
+}
+
+void Emulator::VXBinaryAndRandom(const Instruction &instr)
+{
+}
+
+void Emulator::SkipIfPressed(const Instruction &instr)
+{
+}
+
+void Emulator::SkipIfNotPressed(const Instruction &instr)
+{
+}
+
+void Emulator::AddVX2IndexRegister(const Instruction &instr)
+{
+}
+
+void Emulator::WaitForKeyPress(const Instruction &instr)
+{
+}
+
+void Emulator::SetIndexRegisterForFont(const Instruction &instr)
+{
+}
+
+void Emulator::HexToDecimal(const Instruction &instr)
+{
+}
+
+void Emulator::StoreRegistersInMemory(const Instruction &instr)
+{
+}
+
+void Emulator::ReadRegistersFromMemory(const Instruction &instr)
+{
+}
 
 } // namespace chip8
 

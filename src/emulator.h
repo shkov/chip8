@@ -57,11 +57,37 @@ class Emulator
     void AddToRegisterVX(const Instruction &instr);
     void SetIndexRegister(const Instruction &instr);
     void Display(const Instruction &instr);
+    void CallSubroutine(const Instruction &instr);
+    void ReturnFromSubroutine();
+    void SkipInstructionIfVXEqual(const Instruction &instr);
+    void SkipInstructionIfVXNotEqual(const Instruction &instr);
+    void SkipInstructionIfVXEqualVY(const Instruction &instr);
+    void SkipInstructionIfVXNotEqualVY(const Instruction &instr);
+    void SetVY2VX(const Instruction &instr);
+    void VXBinaryOrVY(const Instruction &instr);
+    void VXBinaryAndVY(const Instruction &instr);
+    void VXBinaryXorVY(const Instruction &instr);
+    void AddVY2VX(const Instruction &instr);
+    void VXSubtractVY(const Instruction &instr);
+    void VYSubtractVX(const Instruction &instr);
+    void ShiftVXRight(const Instruction &instr);
+    void ShiftVXLeft(const Instruction &instr);
+    void JumpWithOffset(const Instruction &instr);
+    void VXBinaryAndRandom(const Instruction &instr);
+    void SkipIfPressed(const Instruction &instr);
+    void SkipIfNotPressed(const Instruction &instr);
+    void AddVX2IndexRegister(const Instruction &instr);
+    void WaitForKeyPress(const Instruction &instr);
+    void SetIndexRegisterForFont(const Instruction &instr);
+    void HexToDecimal(const Instruction &instr);
+    void StoreRegistersInMemory(const Instruction &instr);
+    void ReadRegistersFromMemory(const Instruction &instr);
 
     int program_counter_{ kChip8ProgramStartAddress };
     std::array<uint8_t, 16> variable_registers_{};
+    std::array<uint16_t, 16> stack_{};
+    uint8_t stack_pointer_{ 0 };
     uint16_t index_register_{ 0 };
-
     std::array<uint8_t, kChip8MemorySize> memory_{};
     std::array<std::array<uint8_t, kChip8ScreenWidth>, kChip8ScreenHeight> screen_;
     Window &window_;
