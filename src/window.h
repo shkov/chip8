@@ -6,6 +6,7 @@
 #include <chrono>
 #include <iostream>
 #include <mutex>
+#include <optional>
 #include <thread>
 
 namespace chip8
@@ -44,7 +45,28 @@ class Window : private sf::RenderWindow
         return true;
     }
 
-    void Draw(const std::array<std::array<uint8_t, 64>, 32> &screen)
+    std::optional<sf::Keyboard::Key> WaitKeyPress()
+    {
+        if (closed_)
+            return std::nullopt;
+
+        sf::Event event;
+        if (waitEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+            {
+                close();
+                closed_ = true;
+                return std::nullopt;
+            }
+            if (event.type == sf::Event::KeyPressed)
+                return event.key.code;
+        }
+
+        return sf::Keyboard::Unknown;
+    };
+
+    void Draw(const std::array<std::array<uint8_t, 64>, 32>& screen)
     {
         if (closed_)
             return;

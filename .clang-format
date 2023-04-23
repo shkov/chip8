@@ -1,3 +1,4 @@
 BasedOnStyle: Microsoft
 ColumnLimit: 110
 Cpp11BracedListStyle: false
+PointerAlignment: Left

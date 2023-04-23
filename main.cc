@@ -4,9 +4,10 @@
 #include <iostream>
 
 #include "src/emulator.h"
+#include "src/keyboard.h"
 #include "src/window.h"
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     std::vector<std::string> args(argv, argv + argc);
     if (args.size() < 2)
@@ -23,7 +24,7 @@ int main(int argc, char *argv[])
     {
         emulator.StartExecutionLoop();
     }
-    catch (const std::exception &ex)
+    catch (const std::exception& ex)
     {
         spdlog::error("unexpected exception: {}", ex.what());
     }
