@@ -43,6 +43,13 @@ void Emulator::StartExecutionLoop()
         Instruction instr{ Decode(*raw) };
 
         Execute(instr);
+
+        if (delay_timer_ > 0)
+            --delay_timer_;
+        if (sound_timer_ > 0)
+            --sound_timer_;
+        if (sound_timer_ > 0)
+            printf("%c", 7);
     }
 };
 
@@ -528,23 +535,22 @@ void Emulator::WaitForKeyPress(const Instruction& instr)
     variable_registers_[register_vx] = *key;
 }
 
-void Emulator::SetDelayTimer(const Instruction&)
+void Emulator::SetDelayTimer(const Instruction& instr)
 {
-
-    std::cout << "SetDelayTimer" << std::endl;
+    size_t register_vx{ instr.second_nibble };
+    delay_timer_ = variable_registers_[register_vx];
 }
 
-void Emulator::SetSoundTimer(const Instruction&)
+void Emulator::SetSoundTimer(const Instruction& instr)
 {
-
-    std::cout << "SetSoundTimer" << std::endl;
+    size_t register_vx{ instr.second_nibble };
+    sound_timer_ = variable_registers_[register_vx];
 }
 
-void Emulator::SetDelayTimer2Vx(const Instruction&)
+void Emulator::SetDelayTimer2Vx(const Instruction& instr)
 {
-
-    std::cout << "SetDelayTimer2Vx" << std::endl;
+    size_t register_vx{ instr.second_nibble };
+    variable_registers_[register_vx] = delay_timer_;
 }
 
 } // namespace chip8
-

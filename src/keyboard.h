@@ -74,6 +74,7 @@ class Keyboard
             return sf::Keyboard::V;
         }
         assert(false);
+        return sf::Keyboard::Unknown;
     };
 
     static std::optional<uint8_t> ConvertQwertyToChip8(sf::Keyboard::Key key)

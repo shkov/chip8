@@ -12,3 +12,4 @@ add_subdirectory(contrib/sfml)
 add_subdirectory(src)
 
 target_link_libraries(${PROJECT_NAME} src spdlog)
+target_include_directories(${PROJECT_NAME} PUBLIC src)

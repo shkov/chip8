@@ -91,6 +91,8 @@ class Emulator
     int program_counter_{ kChip8ProgramStartAddress };
     std::array<std::array<uint8_t, kChip8ScreenWidth>, kChip8ScreenHeight> screen_;
     uint16_t index_register_{ 0 };
+    uint8_t delay_timer_{ 0 };
+    uint8_t sound_timer_{ 0 };
 
     Window& window_;
 };

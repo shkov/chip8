@@ -26,4 +26,5 @@ core
 cmake-build-debug
 build
 .tags
-
+.vs
+CMakeSettings.json

@@ -18,8 +18,8 @@ class Window : private sf::RenderWindow
     using Base = sf::RenderWindow;
 
     static inline const size_t kPixelSize{ 20 };
-    static inline const size_t kScreenWidth{ kPixelSize * 64 + kPixelSize - 1 };
-    static inline const size_t kScreenHeight{ kPixelSize * 32 + kPixelSize - 1 };
+    static inline const size_t kScreenWidth{ kPixelSize * 64 };
+    static inline const size_t kScreenHeight{ kPixelSize * 32 };
 
   public:
     Window() : Base{ sf::VideoMode{ { kScreenWidth, kScreenHeight } }, "Chip8" }
@@ -41,7 +41,7 @@ class Window : private sf::RenderWindow
             closed_ = true;
             return false;
         }
-
+        
         return true;
     }
 
@@ -84,10 +84,10 @@ class Window : private sf::RenderWindow
                 pixel.setFillColor(screen[y][x] ? sf::Color::White : sf::Color::Black);
                 pixel.setPosition(sf::Vector2f(position_x, position_y));
                 draw(pixel);
-                position_x += kPixelSize + 1;
+                position_x += kPixelSize;
             }
             position_x = 0;
-            position_y += kPixelSize + 1;
+            position_y += kPixelSize;
         }
 
         display();
