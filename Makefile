@@ -21,7 +21,7 @@ build:
 run:
 	# Running chip8 ...
 	@\
-  ./build/chip8 programs/spaceinvaders.ch8
+  ./build/chip8 programs/spaceinvaders.ch8 programs/beep.wav
 	# OK
 
 .PHONY: pull-submodules

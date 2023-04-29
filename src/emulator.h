@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "screen.h"
+#include "speaker.h"
 
 namespace chip8 {
 
@@ -26,7 +27,8 @@ class Emulator {
     0xF0, 0xE0, 0x90, 0x90, 0x90, 0xE0, 0xF0, 0x80, 0xF0, 0x80, 0xF0, 0xF0, 0x80, 0xF0, 0x80, 0x80
   };
 
-  explicit Emulator(const std::string& filename, Screen& screen);
+  explicit Emulator(const std::string& filename, Screen& screen, Speaker& speaker,
+                    std::chrono::microseconds delay);
 
   void StartExecutionLoop();
 
@@ -45,6 +47,7 @@ class Emulator {
   std::optional<std::array<uint8_t, 2>> Fetch();
   static Instruction Decode(std::array<uint8_t, 2> instr);
   void Execute(const Instruction& instr);
+  void OnTimersTick();
 
   void ClearScreen();
   void Jump(const Instruction& instr);
@@ -91,7 +94,9 @@ class Emulator {
   uint8_t delay_timer_{ 0 };
   uint8_t sound_timer_{ 0 };
 
+  std::chrono::microseconds delay_;
   Screen& screen_;
+  Speaker& speaker_;
 };
 
 }  // namespace chip8

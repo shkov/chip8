@@ -2,7 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
 #include <cstdint>
 #include <optional>
 
@@ -92,7 +92,7 @@ class Keyboard {
       case sf::Keyboard::S:
         return 0x8;
       case sf::Keyboard::D:
-        return sf::Keyboard::D;
+        return 0x9;
       case sf::Keyboard::F:
         return 0xE;
 

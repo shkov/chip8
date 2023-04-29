@@ -7,7 +7,6 @@
 #include <chrono>
 #include <cstdint>
 #include <cstdlib>
-#include <ctime>
 #include <exception>
 #include <fstream>
 #include <iomanip>
@@ -16,13 +15,18 @@
 #include <optional>
 #include <random>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "keyboard.h"
+#include "screen.h"
+#include "speaker.h"
 
 namespace chip8 {
 
-Emulator::Emulator(const std::string& filename, Screen& s) : screen_{ s } {
+Emulator::Emulator(const std::string& filename, Screen& screen, Speaker& speaker,
+                   std::chrono::microseconds delay)
+    : screen_{ screen }, speaker_(speaker), delay_{ delay } {
   std::srand(std::time(nullptr));
   ClearScreen();
   LoadFontSet();
@@ -40,9 +44,7 @@ void Emulator::StartExecutionLoop() {
 
     Execute(instr);
 
-    if (delay_timer_ > 0) --delay_timer_;
-    if (sound_timer_ > 0) --sound_timer_;
-    if (sound_timer_ > 0) printf("%c", 7);
+    OnTimersTick();
   }
 };
 
@@ -226,6 +228,15 @@ void Emulator::Execute(const Instruction& instr) {
     default:
       throw std::invalid_argument{ "unknown opcode" };
   }
+};
+
+void Emulator::OnTimersTick() {
+  if (delay_timer_ > 0) --delay_timer_;
+  if (sound_timer_ > 0) --sound_timer_;
+  if (sound_timer_ > 0) {
+    speaker_.Play();
+  }
+  std::this_thread::sleep_for(std::chrono::microseconds{ delay_ });
 };
 
 void Emulator::ClearScreen() {
