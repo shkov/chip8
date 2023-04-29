@@ -102,9 +102,11 @@ void Emulator::Execute(const Instruction& instr) {
             case 0x0:
               ClearScreen();
               return;
+
             case 0xE:
               ReturnFromSubroutine();
               return;
+
             default:
               throw std::invalid_argument{ "unknown opcode" };
           }
@@ -112,117 +114,131 @@ void Emulator::Execute(const Instruction& instr) {
       return;
 
     case 0x1:
-      Jump(instr);
+      Jump(instr.raw & 0x0FFF);
       return;
 
     case 0x2:
-      CallSubroutine(instr);
+      CallSubroutine(instr.raw & 0x0FFF);
       return;
 
     case 0x3:
-      SkipInstructionIfVxEqual(instr);
+      SkipInstructionIfVxEqual(instr.second_nibble, instr.raw & 0x00FF);
       return;
 
     case 0x4:
-      SkipInstructionIfVxNotEqual(instr);
+      SkipInstructionIfVxNotEqual(instr.second_nibble, instr.raw & 0x00FF);
       return;
 
     case 0x5:
-      SkipInstructionIfVxEqualVy(instr);
+      SkipInstructionIfVxEqualVy(instr.second_nibble, instr.third_nibble);
       return;
 
     case 0x6:
-      SetRegisterVx(instr);
+      SetRegisterVx(instr.second_nibble, instr.raw & 0x00FF);
       return;
 
     case 0x7:
-      AddToRegisterVx(instr);
+      AddToRegisterVx(instr.second_nibble, instr.raw & 0x00FF);
       return;
 
     case 0x8:
       switch (instr.fourth_nibble) {
         case 0x0:
-          SetVy2Vx(instr);
+          SetVy2Vx(instr.second_nibble, instr.third_nibble);
           return;
         case 0x1:
-          VxBinaryOrVy(instr);
+          VxBinaryOrVy(instr.second_nibble, instr.third_nibble);
           return;
         case 0x2:
-          VxBinaryAndVy(instr);
+          VxBinaryAndVy(instr.second_nibble, instr.third_nibble);
           return;
         case 0x3:
-          VxBinaryXorVy(instr);
+          VxBinaryXorVy(instr.second_nibble, instr.third_nibble);
           return;
         case 0x4:
-          AddVy2Vx(instr);
+          AddVy2Vx(instr.second_nibble, instr.third_nibble);
           return;
         case 0x5:
-          VxSubtractVy(instr);
+          VxSubtractVy(instr.second_nibble, instr.third_nibble);
           return;
         case 0x6:
-          ShiftVxRight(instr);
+          ShiftVxRight(instr.second_nibble);
           return;
         case 0x7:
-          VySubtractVx(instr);
+          VySubtractVx(instr.second_nibble, instr.third_nibble);
           return;
         case 0xE:
-          ShiftVxLeft(instr);
+          ShiftVxLeft(instr.second_nibble);
           return;
         default:
           throw std::invalid_argument{ "unknown opcode" };
       }
+
       return;
 
     case 0x9:
-      SkipInstructionIfVxNotEqualVy(instr);
+      SkipInstructionIfVxNotEqualVy(instr.second_nibble, instr.third_nibble);
       return;
 
     case 0xA:
-      SetIndexRegister(instr);
+      SetIndexRegister(instr.raw & 0x0FFF);
       return;
 
     case 0xB:
-      JumpWithOffset(instr);
+      JumpWithOffset(instr.raw & 0x0FFF);
       return;
 
     case 0xC:
-      VxBinaryAndRandom(instr);
+      VxBinaryAndRandom(instr.second_nibble, instr.raw & 0x00FF);
       return;
 
     case 0xD:
-      Display(instr);
+      Display(instr.second_nibble, instr.third_nibble, instr.fourth_nibble);
       return;
 
     case 0xE:
       if (instr.third_nibble == 0x9 && instr.fourth_nibble == 0xE)
-        SkipInstructionIfPressed(instr);
+        SkipInstructionIfPressed(instr.second_nibble);
+
       else if (instr.third_nibble == 0xA && instr.fourth_nibble == 0x1)
-        SkipInstructionIfNotPressed(instr);
+        SkipInstructionIfNotPressed(instr.second_nibble);
+
       else
         throw std::invalid_argument{ "unknown opcode" };
+
       return;
 
     case 0xF:
       if (instr.third_nibble == 0x1 && instr.fourth_nibble == 0xE)
-        AddVx2IndexRegister(instr);
+        AddVx2IndexRegister(instr.second_nibble);
+
       else if (instr.third_nibble == 0x0 && instr.fourth_nibble == 0xA)
-        WaitForKeyPress(instr);
+        WaitForKeyPress(instr.second_nibble);
+
       else if (instr.third_nibble == 0x2 && instr.fourth_nibble == 0x9)
-        SetIndexRegisterForFont(instr);
+        SetIndexRegisterForFont(instr.second_nibble);
+
       else if (instr.third_nibble == 0x3 && instr.fourth_nibble == 0x3)
-        HexToDecimal(instr);
+        HexInVxToDecimal(instr.second_nibble);
+
       else if (instr.third_nibble == 0x5 && instr.fourth_nibble == 0x5)
-        StoreRegistersInMemory(instr);
+        StoreRegistersInMemory(instr.second_nibble);
+
       else if (instr.third_nibble == 0x6 && instr.fourth_nibble == 0x5)
-        LoadRegistersFromMemory(instr);
+        LoadRegistersFromMemory(instr.second_nibble);
+
       else if (instr.third_nibble == 0x0 && instr.fourth_nibble == 0x7)
-        SetDelayTimer2Vx(instr);
+        SetDelayTimer2Vx(instr.second_nibble);
+
       else if (instr.third_nibble == 0x1 && instr.fourth_nibble == 0x5)
-        SetDelayTimer(instr);
+        SetDelayTimer(instr.second_nibble);
+
       else if (instr.third_nibble == 0x1 && instr.fourth_nibble == 0x8)
-        SetSoundTimer(instr);
+        SetSoundTimer(instr.second_nibble);
+
       else
         throw std::invalid_argument{ "unknown opcode" };
+
       return;
 
     default:
@@ -248,27 +264,21 @@ void Emulator::ClearScreen() {
   screen_.Draw(screen_matrix_);
 };
 
-void Emulator::Jump(const Instruction& instr) { program_counter_ = instr.raw & 0x0FFF; };
+void Emulator::Jump(uint16_t address) { program_counter_ = address; };
 
-void Emulator::SetRegisterVx(const Instruction& instr) {
-  size_t register_idx{ instr.second_nibble };
-  variable_registers_[register_idx] = instr.raw & 0x00FF;
-};
+void Emulator::SetRegisterVx(uint8_t x, uint8_t value) { variable_registers_[x] = value; };
 
-void Emulator::AddToRegisterVx(const Instruction& instr) {
-  size_t register_idx{ instr.second_nibble };
-  variable_registers_[register_idx] += instr.raw & 0x00FF;
-};
+void Emulator::AddToRegisterVx(uint8_t x, uint8_t value) { variable_registers_[x] += value; };
 
-void Emulator::SetIndexRegister(const Instruction& instr) { index_register_ = instr.raw & 0x0FFF; };
+void Emulator::SetIndexRegister(uint16_t value) { index_register_ = value; };
 
-void Emulator::Display(const Instruction& instr) {
-  uint8_t start_from_y = variable_registers_[instr.third_nibble] % kChip8ScreenHeight;
-  uint8_t start_from_x = variable_registers_[instr.second_nibble] % kChip8ScreenWidth;
+void Emulator::Display(uint8_t x, uint8_t y, uint8_t n) {
+  uint8_t start_from_y = variable_registers_[y] % kChip8ScreenHeight;
+  uint8_t start_from_x = variable_registers_[x] % kChip8ScreenWidth;
 
   variable_registers_[0xF] = 0;
 
-  for (size_t y = 0; y < instr.fourth_nibble; ++y) {
+  for (size_t y = 0; y < n; ++y) {
     size_t target_y{ start_from_y + y };
     if (target_y >= kChip8ScreenHeight) {
       break;
@@ -295,10 +305,10 @@ void Emulator::Display(const Instruction& instr) {
   screen_.Draw(screen_matrix_);
 };
 
-void Emulator::CallSubroutine(const Instruction& instr) {
+void Emulator::CallSubroutine(uint16_t address) {
   ++stack_pointer_;
   stack_[stack_pointer_] = program_counter_;
-  Jump(instr);
+  program_counter_ = address;
 }
 
 void Emulator::ReturnFromSubroutine() {
@@ -306,182 +316,134 @@ void Emulator::ReturnFromSubroutine() {
   program_counter_ = addr;
 }
 
-void Emulator::SkipInstructionIfVxEqual(const Instruction& instr) {
-  size_t register_idx{ instr.second_nibble };
-  if (variable_registers_[register_idx] == (instr.raw & 0x00FF)) program_counter_ += 2;
+void Emulator::SkipInstructionIfVxEqual(uint8_t x, uint8_t value) {
+  if (variable_registers_[x] == (value)) program_counter_ += 2;
 }
 
-void Emulator::SkipInstructionIfVxNotEqual(const Instruction& instr) {
-  size_t register_idx{ instr.second_nibble };
-  if (variable_registers_[register_idx] != (instr.raw & 0x00FF)) program_counter_ += 2;
+void Emulator::SkipInstructionIfVxNotEqual(uint8_t x, uint8_t value) {
+  if (variable_registers_[x] != (value)) program_counter_ += 2;
 }
 
-void Emulator::SkipInstructionIfVxEqualVy(const Instruction& instr) {
-  size_t register_vx{ instr.second_nibble };
-  size_t register_vy{ instr.third_nibble };
-  if (variable_registers_[register_vx] == variable_registers_[register_vy]) program_counter_ += 2;
+void Emulator::SkipInstructionIfVxEqualVy(uint8_t x, uint8_t y) {
+  if (variable_registers_[x] == variable_registers_[y]) program_counter_ += 2;
 }
 
-void Emulator::SkipInstructionIfVxNotEqualVy(const Instruction& instr) {
-  size_t register_vx{ instr.second_nibble };
-  size_t register_vy{ instr.third_nibble };
-  if (variable_registers_[register_vx] != variable_registers_[register_vy]) program_counter_ += 2;
+void Emulator::SkipInstructionIfVxNotEqualVy(uint8_t x, uint8_t y) {
+  if (variable_registers_[x] != variable_registers_[y]) program_counter_ += 2;
 }
 
-void Emulator::SkipInstructionIfPressed(const Instruction& instr) {
-  size_t register_vx{ instr.second_nibble };
-  uint8_t key{ variable_registers_[register_vx] };
+void Emulator::SkipInstructionIfPressed(uint8_t x) {
+  uint8_t key{ variable_registers_[x] };
   if (Keyboard::IsKeyPressed(key)) program_counter_ += 2;
 }
 
-void Emulator::SkipInstructionIfNotPressed(const Instruction& instr) {
-  size_t register_vx{ instr.second_nibble };
-  uint8_t key{ variable_registers_[register_vx] };
+void Emulator::SkipInstructionIfNotPressed(uint8_t x) {
+  uint8_t key{ variable_registers_[x] };
   if (!Keyboard::IsKeyPressed(key)) program_counter_ += 2;
 }
 
-void Emulator::SetVy2Vx(const Instruction& instr) {
-  size_t register_vx{ instr.second_nibble };
-  size_t register_vy{ instr.third_nibble };
-  variable_registers_[register_vx] = variable_registers_[register_vy];
+void Emulator::SetVy2Vx(uint8_t x, uint8_t y) { variable_registers_[x] = variable_registers_[y]; }
+
+void Emulator::VxBinaryOrVy(uint8_t x, uint8_t y) {
+  variable_registers_[x] = variable_registers_[x] | variable_registers_[y];
 }
 
-void Emulator::VxBinaryOrVy(const Instruction& instr) {
-  size_t register_vx{ instr.second_nibble };
-  size_t register_vy{ instr.third_nibble };
-  variable_registers_[register_vx] = variable_registers_[register_vx] | variable_registers_[register_vy];
+void Emulator::VxBinaryAndVy(uint8_t x, uint8_t y) {
+  variable_registers_[x] = variable_registers_[x] & variable_registers_[y];
 }
 
-void Emulator::VxBinaryAndVy(const Instruction& instr) {
-  size_t register_vx{ instr.second_nibble };
-  size_t register_vy{ instr.third_nibble };
-  variable_registers_[register_vx] = variable_registers_[register_vx] & variable_registers_[register_vy];
+void Emulator::VxBinaryXorVy(uint8_t x, uint8_t y) {
+  variable_registers_[x] = variable_registers_[x] ^ variable_registers_[y];
 }
 
-void Emulator::VxBinaryXorVy(const Instruction& instr) {
-  size_t register_vx{ instr.second_nibble };
-  size_t register_vy{ instr.third_nibble };
-  variable_registers_[register_vx] = variable_registers_[register_vx] ^ variable_registers_[register_vy];
-}
-
-void Emulator::AddVy2Vx(const Instruction& instr) {
-  size_t register_vx{ instr.second_nibble };
-  size_t register_vy{ instr.third_nibble };
-  int result{ variable_registers_[register_vx] + variable_registers_[register_vy] };
+void Emulator::AddVy2Vx(uint8_t x, uint8_t y) {
+  int result{ variable_registers_[x] + variable_registers_[y] };
   if (result > 255)
     variable_registers_[0xF] = 1;
   else
     variable_registers_[0xF] = 0;
 
-  variable_registers_[register_vx] = result;
+  variable_registers_[x] = result;
 }
 
-void Emulator::VxSubtractVy(const Instruction& instr) {
-  size_t register_vx{ instr.second_nibble };
-  size_t register_vy{ instr.third_nibble };
-  if (register_vx > register_vy)
+void Emulator::VxSubtractVy(uint8_t x, uint8_t y) {
+  if (variable_registers_[x] > variable_registers_[y])
     variable_registers_[0xF] = 1;
   else
     variable_registers_[0xF] = 0;
-  variable_registers_[register_vx] = variable_registers_[register_vx] - variable_registers_[register_vy];
+  variable_registers_[x] = variable_registers_[x] - variable_registers_[y];
 }
 
-void Emulator::VySubtractVx(const Instruction& instr) {
-  size_t register_vx{ instr.second_nibble };
-  size_t register_vy{ instr.third_nibble };
-  if (register_vy > register_vx)
+void Emulator::VySubtractVx(uint8_t x, uint8_t y) {
+  if (variable_registers_[y] > variable_registers_[x])
     variable_registers_[0xF] = 1;
   else
     variable_registers_[0xF] = 0;
-  variable_registers_[register_vx] = variable_registers_[register_vy] - variable_registers_[register_vx];
+  variable_registers_[x] = variable_registers_[y] - variable_registers_[x];
 }
 
-void Emulator::ShiftVxRight(const Instruction& instr) {
-  size_t register_vx{ instr.second_nibble };
-  int shifted{ variable_registers_[register_vx] & 0x1 };
+void Emulator::ShiftVxRight(uint8_t x) {
+  int shifted{ variable_registers_[x] & 0x1 };
   if (shifted > 0)
     variable_registers_[0xF] = 1;
   else
     variable_registers_[0xF] = 0;
-  variable_registers_[register_vx] >>= 1;
+  variable_registers_[x] >>= 1;
 }
 
-void Emulator::ShiftVxLeft(const Instruction& instr) {
-  size_t register_vx{ instr.second_nibble };
-  int shifted{ variable_registers_[register_vx] & 0x8 };
+void Emulator::ShiftVxLeft(uint8_t x) {
+  int shifted{ variable_registers_[x] & 0x8 };
   if (shifted > 0)
     variable_registers_[0xF] = 1;
   else
     variable_registers_[0xF] = 0;
-  variable_registers_[register_vx] <<= 1;
+  variable_registers_[x] <<= 1;
 }
 
-void Emulator::JumpWithOffset(const Instruction& instr) {
-  program_counter_ = instr.raw & 0x0FFF;
+void Emulator::JumpWithOffset(uint16_t address) {
+  program_counter_ = address;
   program_counter_ += variable_registers_[0x0];
 }
 
-void Emulator::VxBinaryAndRandom(const Instruction& instr) {
-  size_t register_vx{ instr.second_nibble };
+void Emulator::VxBinaryAndRandom(uint8_t x, uint8_t value) {
   int random = std::rand() % 8;
-  variable_registers_[register_vx] = random & (instr.raw & 0x00FF);
+  variable_registers_[x] = random & value;
 }
 
-void Emulator::AddVx2IndexRegister(const Instruction& instr) {
-  size_t register_vx{ instr.second_nibble };
-  index_register_ += variable_registers_[register_vx];
+void Emulator::AddVx2IndexRegister(uint8_t x) { index_register_ += variable_registers_[x]; }
+
+void Emulator::SetIndexRegisterForFont(uint8_t x) { index_register_ = variable_registers_[x]; }
+
+void Emulator::HexInVxToDecimal(uint8_t x) {
+  uint8_t hex_number{ variable_registers_[x] };
+  memory_[index_register_] = hex_number / 100;
+  memory_[index_register_ + 1] = (hex_number / 10) % 10;
+  memory_[index_register_ + 2] = (hex_number % 100) % 10;
 }
 
-void Emulator::SetIndexRegisterForFont(const Instruction& instr) {
-  size_t register_vx{ instr.second_nibble };
-  index_register_ = variable_registers_[register_vx];
-}
-
-void Emulator::HexToDecimal(const Instruction& instr) {
-  size_t register_vx{ instr.second_nibble };
-  uint8_t hex_number{ variable_registers_[register_vx] };
-  memory_[index_register_ + 2] = hex_number % 10;
-  hex_number /= 10;
-  memory_[index_register_ + 1] = hex_number % 10;
-  hex_number /= 10;
-  memory_[index_register_] = hex_number;
-}
-
-void Emulator::StoreRegistersInMemory(const Instruction& instr) {
-  size_t x{ instr.second_nibble };
+void Emulator::StoreRegistersInMemory(uint8_t x) {
   for (size_t i = 0; i <= x; ++i) {
     memory_[index_register_ + i] = variable_registers_[i];
   }
 }
 
-void Emulator::LoadRegistersFromMemory(const Instruction& instr) {
-  size_t x{ instr.second_nibble };
+void Emulator::LoadRegistersFromMemory(uint8_t x) {
   for (size_t i = 0; i <= x; ++i) {
     variable_registers_[i] = memory_[index_register_ + i];
   }
 }
 
-void Emulator::WaitForKeyPress(const Instruction& instr) {
+void Emulator::WaitForKeyPress(uint8_t x) {
   std::optional<uint8_t> key{ Keyboard::WaitForKeyPress(screen_) };
   if (!key.has_value()) return;
 
-  size_t register_vx{ instr.second_nibble };
-  variable_registers_[register_vx] = *key;
+  variable_registers_[x] = *key;
 }
 
-void Emulator::SetDelayTimer(const Instruction& instr) {
-  size_t register_vx{ instr.second_nibble };
-  delay_timer_ = variable_registers_[register_vx];
-}
+void Emulator::SetDelayTimer(uint8_t x) { delay_timer_ = variable_registers_[x]; }
 
-void Emulator::SetSoundTimer(const Instruction& instr) {
-  size_t register_vx{ instr.second_nibble };
-  sound_timer_ = variable_registers_[register_vx];
-}
+void Emulator::SetSoundTimer(uint8_t x) { sound_timer_ = variable_registers_[x]; }
 
-void Emulator::SetDelayTimer2Vx(const Instruction& instr) {
-  size_t register_vx{ instr.second_nibble };
-  variable_registers_[register_vx] = delay_timer_;
-}
+void Emulator::SetDelayTimer2Vx(uint8_t x) { variable_registers_[x] = delay_timer_; }
 
 }  // namespace chip8
